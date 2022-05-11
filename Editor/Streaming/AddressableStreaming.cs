@@ -304,6 +304,11 @@ namespace Unity.HLODSystem.Streaming
                     {
                         textureImporter.wrapMode = serializeTexture.WrapMode;
                         textureImporter.sRGBTexture = GraphicsFormatUtility.IsSRGBFormat(serializeTexture.GraphicsFormat);
+
+                        textureImporter.mipMapBias = serializeTexture.MipMapBias;
+                        textureImporter.anisoLevel = serializeTexture.AnisoLevel;
+                        textureImporter.filterMode = serializeTexture.FilterMode;
+
                         textureImporter.SaveAndReimport();
                     }
 
