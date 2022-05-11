@@ -64,6 +64,18 @@ namespace Unity.HLODSystem.Streaming
         {
             if ( AddressableLoadManager.Instance != null)
                 AddressableLoadManager.Instance.UnregisterController(this);
+
+            foreach(var entry in m_createdLowObjects)
+            {
+                DestroyLowObject(entry.Value);
+            }
+            m_createdLowObjects.Clear();
+
+            foreach (var entry in m_createdHighObjects)
+            {
+                DestroyHighObject(entry.Key);
+            }
+            m_createdLowObjects.Clear();
         }
 
 
@@ -196,9 +208,16 @@ namespace Unity.HLODSystem.Streaming
         {
             if (m_createdHighObjects.ContainsKey(id) == false)
                 return;
-            
+
+            DestroyHighObject(id);
+
+            m_createdHighObjects.Remove(id);
+        }
+
+        void DestroyHighObject(int id)
+        {
             if (string.IsNullOrEmpty(m_highObjects[id].Address) == true)
-            { 
+            {
                 m_createdHighObjects[id].GameObject.SetActive(false);
             }
             else
@@ -207,9 +226,8 @@ namespace Unity.HLODSystem.Streaming
                 DestoryObject(info.GameObject);
                 AddressableLoadManager.Instance.UnloadAsset(info.Handle);
             }
-
-            m_createdHighObjects.Remove(id);
         }
+
         public override void ReleaseLowObject(int id)
         {
             if (m_createdLowObjects.ContainsKey(id) == false)
@@ -217,7 +235,12 @@ namespace Unity.HLODSystem.Streaming
             
             LoadInfo info = m_createdLowObjects[id];
             m_createdLowObjects.Remove(id);
-            
+
+            DestroyLowObject(info);
+        }
+
+        void DestroyLowObject(LoadInfo info)
+        {
             DestoryObject(info.GameObject);
             AddressableLoadManager.Instance.UnloadAsset(info.Handle);
         }
