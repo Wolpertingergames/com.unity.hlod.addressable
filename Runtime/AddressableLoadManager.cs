@@ -113,8 +113,9 @@ namespace Unity.HLODSystem
         }
         #endregion
 
+        public int ParallelLoadLimit = 1;
 
-        private bool m_isLoading = false;
+        private int m_loadsPending;
         private LinkedList<Handle> m_loadQueue = new LinkedList<Handle>();
 
         private void OnDestroy()
@@ -173,7 +174,7 @@ namespace Unity.HLODSystem
 
             if (node == null)
             {
-                if (m_isLoading == true)
+                if (m_loadsPending > ParallelLoadLimit)
                 {
                     m_loadQueue.AddLast(handle);
                 }
@@ -192,7 +193,7 @@ namespace Unity.HLODSystem
         {
             handle.Completed += handle1 =>
             {
-                m_isLoading = false;
+                m_loadsPending--;
                 if (m_loadQueue.Count > 0)
                 {
                     Handle nextHandle = m_loadQueue.First.Value;
@@ -200,7 +201,7 @@ namespace Unity.HLODSystem
                     StartLoad(nextHandle);
                 }
             };
-            m_isLoading = true;
+            m_loadsPending++;
             handle.Start();
         }
    

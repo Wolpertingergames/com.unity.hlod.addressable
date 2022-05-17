@@ -11,6 +11,8 @@ namespace Unity.HLODSystem.Streaming
 {
     public class AddressableHLODController : HLODControllerBase
     {
+        public static int GlobalLoadPriorityMultiplyerBoost = 0;
+
         [Serializable]
         public class ChildObject
         {
@@ -32,7 +34,8 @@ namespace Unity.HLODSystem.Streaming
 
         [SerializeField]
         int m_priority = 0;
-        
+        int Priority => m_priority + GlobalLoadPriorityMultiplyerBoost;
+
         class LoadInfo
         {
             public GameObject GameObject;
@@ -47,7 +50,7 @@ namespace Unity.HLODSystem.Streaming
         private GameObject m_hlodMeshesRoot;
         private int m_hlodLayerIndex;
 
-        public event Action<GameObject> HighObjectCreated;
+        //public event Action<GameObject> HighObjectCreated;
         
         public override void OnStart()
         {
@@ -163,13 +166,13 @@ namespace Unity.HLODSystem.Streaming
                 else
                 {
                     //high object's priority is always lowest.
-                    LoadInfo loadInfo = CreateLoadInfo(m_highObjects[id].Address, m_priority, distance,
+                    LoadInfo loadInfo = CreateLoadInfo(m_highObjects[id].Address, Priority, distance,
                         m_highObjects[id].Parent, m_highObjects[id].Position, m_highObjects[id].Rotation, m_highObjects[id].Scale);
                     m_createdHighObjects.Add(id, loadInfo);
                     
                     loadInfo.Callbacks = new List<Action<GameObject>>();
                     loadInfo.Callbacks.Add(loadDoneCallback);
-                    loadInfo.Callbacks.Add(o => { HighObjectCreated?.Invoke(o); });
+                    //loadInfo.Callbacks.Add(o => { HighObjectCreated?.Invoke(o); });
                 }
                 
             }            
@@ -196,7 +199,7 @@ namespace Unity.HLODSystem.Streaming
             }
             else
             {
-                LoadInfo loadInfo = CreateLoadInfo(m_lowObjects[id], m_priority, distance, m_hlodMeshesRoot.transform, Vector3.zero, Quaternion.identity,Vector3.one);
+                LoadInfo loadInfo = CreateLoadInfo(m_lowObjects[id], Priority, distance, m_hlodMeshesRoot.transform, Vector3.zero, Quaternion.identity,Vector3.one);
                 m_createdLowObjects.Add(id, loadInfo);
 
                 loadInfo.Callbacks = new List<Action<GameObject>>();
