@@ -244,8 +244,13 @@ namespace Unity.HLODSystem.Streaming
 
         void DestroyLowObject(LoadInfo info)
         {
-            DestoryObject(info.GameObject);
-            AddressableLoadManager.Instance.UnloadAsset(info.Handle);
+            if (info == null)
+                return;
+
+            if(info.GameObject != null)
+                DestoryObject(info.GameObject);
+            if(info.Handle != null)
+                AddressableLoadManager.Instance.UnloadAsset(info.Handle);
         }
 
         private void DestoryObject(Object obj)
